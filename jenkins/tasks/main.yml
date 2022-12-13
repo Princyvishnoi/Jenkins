@@ -23,7 +23,7 @@
 - name: install jenkins
   apt:
     name: jenkins
-    state: present
+    state: latest
 
 - name: Start Jenkins
   service:
