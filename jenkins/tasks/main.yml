@@ -1,6 +1,5 @@
 ---
 # tasks file for jenkins
-
 - name: install java
   apt:
     name: "{{ java_version }}"
@@ -24,7 +23,7 @@
 - name: install jenkins
   apt:
     name: jenkins
-    state: latest
+    state: present
 
 - name: Start Jenkins
   service:
