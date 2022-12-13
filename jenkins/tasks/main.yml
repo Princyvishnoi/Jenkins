@@ -3,44 +3,31 @@
 
 - name: install java
   apt:
-    name: openjdk-8-jdk
+    name: "{{ java_version }}"
+    state: present
+    update_cache: yes
+
+- name: add repository key to system
+  apt_key:
+    url: "{{ repository_url }}"
     state: present
 
-- name: Add Jenkins apt installation.
-  get_url:
-    url: "{{ jenkins_url }}"
-    dest: /etc/apt/trusted.gpg.d/jenkins.asc
-    mode: '0644'
-    force: true
-      
-- name: Add Jenkins 
+- name: ensure the repository is configured
   apt_repository:
-    repo: "{{ jenkins_repo_url }}"
+    repo: deb http://pkg.jenkins.io/debian-stable binary/
     state: present
-    update_cache: true
-    when: jenkins_repo_url | default(false)
-  
+
+- name: package
+  package:
+    update_cache: yes
+
 - name: install jenkins
   apt:
-    name: install jenkins 
-    state: present
+    name: jenkins
+    state: latest
 
-- name: Ensure Jenkins is started and runs on startup.
-  service: name=jenkins state=started enabled=yes
-  notify:
-     - start jenkins
-
-- name: configure default users
-  template:
-    src: basic-security.groovy.j2
-    dest: "{{ jenkins_home }}/init.groovy.d/basic-security.groovy"
-    owner: "{{ jenkins_process_user }}"
-    group: "{{ jenkins_process_group }}"
-    mode: 0775
-  notify:
-    - Restart jenkins
-
-
-
-
-
+- name: Start Jenkins
+  service:
+    name: jenkins
+    enabled: true
+    state: started
